@@ -19,14 +19,13 @@ semver_bash can be used from the command line as:
 
 
 Alternatively, you can source it from within a script:
-`
-. ./semver.sh  
 
-local MAJOR=0  
-local MINOR=0  
-local PATCH=0  
-local SPECIAL=""
-
-semverParseInto "1.2.3" MAJOR MINOR PATCH SPECIAL  
-semverParseInto "3.2.1" MAJOR MINOR PATCH SPECIAL  
-`
+    . ./semver.sh  
+    
+    local MAJOR=0  
+    local MINOR=0  
+    local PATCH=0  
+    local SPECIAL=""
+    
+    semverParseInto "1.2.3" MAJOR MINOR PATCH SPECIAL  
+    semverParseInto "3.2.1" MAJOR MINOR PATCH SPECIAL  
