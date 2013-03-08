@@ -65,14 +65,13 @@ function semverLT() {
         return 0
     fi
 
-    if [ $MINOR_A -lt $MINOR_B ]; then
+    if [[ $MAJOR_A -le $MAJOR_B  && $MINOR_A -lt $MINOR_B ]]; then
         return 0
     fi
-
-    if [ $PATCH_A -lt $PATCH_B ]; then
+    
+    if [[ $MAJOR_A -le $MAJOR_B  && $MINOR_A -le $MINOR_B && $PATCH_A -lt $PATCH_B ]]; then
         return 0
     fi
-
 
     if [[ "_$SPECIAL_A"  == "_" ]] && [[ "_$SPECIAL_B"  == "_" ]] ; then
         return 1

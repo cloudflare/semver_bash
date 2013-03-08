@@ -9,6 +9,7 @@ local C=R1.4.2
 local D=R1.3.3
 local E=R1.3.2a
 local F=R1.3.2b
+local G=R1.2.3
 
 local MAJOR=0
 local MINOR=0
@@ -126,6 +127,25 @@ echo "$F < $E -> $?. Expect 1."
 
 semverGT $F $E
 echo "$F > $E -> $?. Expect 0."
+
+echo "Minor and patch number comparisons"
+semverEQ $A $G
+echo "$A == $G -> $?. Expect 1."
+
+semverLT $A $G
+echo "$A < $G -> $?. Expect 1."
+
+semverGT $A $G
+echo "$A > $G -> $?. Expect 0."
+
+semverEQ $G $A
+echo "$G == $A -> $?. Expect 1."
+
+semverLT $G $A
+echo "$G < $A -> $?. Expect 0."
+
+semverGT $G $A
+echo "$G > $A -> $?. Expect 1."
 }
 
 semverTest
