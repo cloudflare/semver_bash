@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 function semverParseInto() {
-    local RE='[^0-9]*\([0-9]*\)[.]\([0-9]*\)[.]\([0-9]*\)\([0-9A-Za-z-]*\)'
+    local RE='[^0-9]*\([0-9]*\)[.]\([0-9]*\)[.]\([0-9]*\)[-]\{0,1\}\([0-9A-Za-z-]*\)'
     #MAJOR
     eval $2=`echo $1 | sed -e "s#$RE#\1#"`
     #MINOR
