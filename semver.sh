@@ -62,6 +62,14 @@ function semverCmp() {
     fi
 
     # special
+    if [[ ( "$SPECIAL_A" != "" ) && ( "$SPECIAL_B" == "" ) ]]; then
+        return -1
+    fi
+
+    if [[ ( "$SPECIAL_A" == "" ) && ( "$SPECIAL_B" != "" ) ]]; then
+        return 1
+    fi
+
     if [[ "$SPECIAL_A" < "$SPECIAL_B" ]]; then
         return -1
     fi

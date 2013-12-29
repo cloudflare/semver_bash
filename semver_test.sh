@@ -30,6 +30,7 @@ local MAJOR=0
 local MINOR=0
 local PATCH=0
 local SPECIAL=""
+
 local VERSION=""
 
 echo "Parsing"
