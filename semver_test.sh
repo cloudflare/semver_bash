@@ -2,6 +2,20 @@
 
 . ./semver.sh
 
+function doTest() {
+    local TEST=$1
+    local EXPECTED=$2
+    local ACTUAL=$3
+
+    echo -n "$TEST: "
+
+    if [[ "$EXPECTED" == "$ACTUAL" ]]; then
+        echo "passed"
+    else
+        echo "FAILED, expected '${EXPECTED}', actual: '${ACTUAL}'"
+    fi
+}
+
 semverTest() {
 local A=R1.3.2
 local B=R2.3.2
@@ -10,6 +24,7 @@ local D=R1.3.3
 local E=R1.3.2a
 local F=R1.3.2b
 local G=R1.2.3
+local H=1.2.3-a
 
 local MAJOR=0
 local MINOR=0
@@ -17,160 +32,184 @@ local PATCH=0
 local SPECIAL=""
 local VERSION=""
 
+echo "Parsing"
 semverParseInto $A MAJOR MINOR PATCH SPECIAL
-echo "$A -> M:$MAJOR m:$MINOR p:$PATCH s:$SPECIAL. Expect M:1 m:3 p:2 s:"
-semverParseInto $E MAJOR MINOR PATCH SPECIAL
-echo "$E -> M:$MAJOR m:$MINOR p:$PATCH s:$SPECIAL. Expect M:1 m:3 p:2 s:a"
+doTest "semverParseInto $A -> M m p s" "M:1 m:3 p:2 s:" "M:$MAJOR m:$MINOR p:$PATCH s:$SPECIAL"
 
-echo "Equality comparisions"
+semverParseInto $B MAJOR MINOR PATCH SPECIAL
+doTest "semverParseInto $B -> M m p s" "M:2 m:3 p:2 s:" "M:$MAJOR m:$MINOR p:$PATCH s:$SPECIAL"
+
+semverParseInto $E MAJOR MINOR PATCH SPECIAL
+doTest "semverParseInto $E -> M m p s" "M:1 m:3 p:2 s:a" "M:$MAJOR m:$MINOR p:$PATCH s:$SPECIAL"
+
+semverParseInto $H MAJOR MINOR PATCH SPECIAL
+doTest "semverParseInto $H -> M m p s" "M:1 m:2 p:3 s:a" "M:$MAJOR m:$MINOR p:$PATCH s:$SPECIAL"
+
+
+echo "Comparisons"
+semverCmp $A $A
+doTest "semverCmp $A $A" 0 $?
+
+semverCmp $A $B
+doTest "semverCmp $A $B" 255 $?
+
+semverCmp $B $A
+doTest "semverCmp $B $A" 1 $?
+
+
+echo "Equality comparisons"
 semverEQ $A $A
-echo "$A == $A -> $?. Expect 0."
+doTest "semverEQ $A $A" 0 $?
 
 semverLT $A $A
-echo "$A < $A -> $?. Expect 1."
+doTest "semverLT $A $A" 1 $?
 
 semverGT $A $A
-echo "$A > $A -> $?. Expect 1."
+doTest "semverGT $A $A" 1 $?
 
 
-echo "Major number comparisions"
+echo "Major number comparisons"
 semverEQ $A $B
-echo "$A == $B -> $?. Expect 1."
+doTest "semverEQ $A $B" 1 $?
 
 semverLT $A $B
-echo "$A < $B -> $?. Expect 0."
+doTest "semverLT $A $B" 0 $?
 
 semverGT $A $B
-echo "$A > $B -> $?. Expect 1."
+doTest "semverGT $A $B" 1 $?
 
 semverEQ $B $A
-echo "$B == $A -> $?. Expect 1."
+doTest "semverEQ $B $A" 1 $?
 
 semverLT $B $A
-echo "$B < $A -> $?. Expect 1."
+doTest "semverLT $B $A" 1 $?
 
 semverGT $B $A
-echo "$B > $A -> $?. Expect 0."
+doTest "semverGT $B $A" 0 $?
 
 
-echo "Minor number comparisions"
+echo "Minor number comparisons"
 semverEQ $A $C
-echo "$A == $C -> $?. Expect 1."
+doTest "semverEQ $A $C" 1 $?
 
 semverLT $A $C
-echo "$A < $C -> $?. Expect 0."
+doTest "semverLT $A $C" 0 $?
 
 semverGT $A $C
-echo "$A > $C -> $?. Expect 1."
+doTest "semverGT $A $C" 1 $?
 
 semverEQ $C $A
-echo "$C == $A -> $?. Expect 1."
+doTest "semverEQ $C $A" 1 $?
 
 semverLT $C $A
-echo "$C < $A -> $?. Expect 1."
+doTest "semverLT $C $A" 1 $?
 
 semverGT $C $A
-echo "$C > $A -> $?. Expect 0."
+doTest "semverGT $C $A" 0 $?
 
-echo "patch number comparisions"
+
+echo "Patch number comparisons"
 semverEQ $A $D
-echo "$A == $D -> $?. Expect 1."
+doTest "semverEQ $A $D" 1 $?
 
 semverLT $A $D
-echo "$A < $D -> $?. Expect 0."
+doTest "semverLT $A $D" 0 $?
 
 semverGT $A $D
-echo "$A > $D -> $?. Expect 1."
+doTest "semverGT $A $D" 1 $?
 
 semverEQ $D $A
-echo "$D == $A -> $?. Expect 1."
+doTest "semverEQ $D $A" 1 $?
 
 semverLT $D $A
-echo "$D < $A -> $?. Expect 1."
+doTest "semverLT $D $A" 1 $?
 
 semverGT $D $A
-echo "$D > $A -> $?. Expect 0."
+doTest "semverGT $D $A" 0 $?
 
-echo "special section vs no special comparisions"
+
+echo "Special section vs no special comparisons"
 semverEQ $A $E
-echo "$A == $E -> $?. Expect 1."
+doTest "semverEQ $A $E" 1 $?
 
 semverLT $A $E
-echo "$A < $E -> $?. Expect 1."
+doTest "semverLT $A $E" 1 $?
 
 semverGT $A $E
-echo "$A > $E -> $?. Expect 0."
+doTest "semverGT $A $E" 0 $?
 
 semverEQ $E $A
-echo "$E == $A -> $?. Expect 1."
+doTest "semverEQ $E $A" 1 $?
 
 semverLT $E $A
-echo "$E < $A -> $?. Expect 0."
+doTest "semverLT $E $A" 0 $?
 
 semverGT $E $A
-echo "$E > $A -> $?. Expect 1."
+doTest "semverGT $E $A" 1 $?
 
-echo "special section vs special comparisions"
+
+echo "Special section vs special comparisons"
 semverEQ $E $F
-echo "$E == $F -> $?. Expect 1."
+doTest "semverEQ $E $F" 1 $?
 
 semverLT $E $F
-echo "$E < $F -> $?. Expect 0."
+doTest "semverLT $E $F" 0 $?
 
 semverGT $E $F
-echo "$E > $F -> $?. Expect 1."
+doTest "semverLT $E $F" 1 $?
 
 semverEQ $F $E
-echo "$F == $E -> $?. Expect 1."
+doTest "semverEQ $F $E" 1 $?
 
 semverLT $F $E
-echo "$F < $E -> $?. Expect 1."
+doTest "semverLT $F $E" 1 $?
 
 semverGT $F $E
-echo "$F > $E -> $?. Expect 0."
+doTest "semverGT $F $E" 0 $?
+
 
 echo "Minor and patch number comparisons"
 semverEQ $A $G
-echo "$A == $G -> $?. Expect 1."
+doTest "semverEQ $A $G" 1 $?
 
 semverLT $A $G
-echo "$A < $G -> $?. Expect 1."
+doTest "semverLT $A $G" 1 $?
 
 semverGT $A $G
-echo "$A > $G -> $?. Expect 0."
+doTest "semverGT $A $G" 0 $?
 
 semverEQ $G $A
-echo "$G == $A -> $?. Expect 1."
+doTest "semverEQ $G $A" 1 $?
 
 semverLT $G $A
-echo "$G < $A -> $?. Expect 0."
+doTest "semverLT $G $A" 0 $?
 
 semverGT $G $A
-echo "$G > $A -> $?. Expect 1."
+doTest "semverGT $G $A" 1 $?
 
 
 echo "Bumping major"
 semverBumpMajor $A VERSION
-echo "$A -> $VERSION. Expect 2.3.2."
+doTest "semverBumpMajor $A" "2.0.0" $VERSION
 
 semverBumpMajor $E VERSION
-echo "$A -> $VERSION. Expect 2.3.2-a."
+doTest "semverBumpMajor $E" "2.0.0" $VERSION
 
 
 echo "Bumping minor"
 semverBumpMinor $A VERSION
-echo "$A -> $VERSION. Expect 1.4.2."
+doTest "semverBumpMinor $A" "1.4.0" $VERSION
 
 semverBumpMinor $E VERSION
-echo "$A -> $VERSION. Expect 1.4.2-a."
+doTest "semverBumpMinor $E" "1.4.0" $VERSION
 
 
 echo "Bumping patch"
 semverBumpPatch $A VERSION
-echo "$A -> $VERSION. Expect 1.3.3."
+doTest "semverBumpPatch $A" "1.3.3" $VERSION
 
 semverBumpPatch $E VERSION
-echo "$A -> $VERSION. Expect 1.3.3-a."
+doTest "semverBumpPatch $E" "1.3.3" $VERSION
 }
 
 semverTest

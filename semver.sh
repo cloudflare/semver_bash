@@ -20,7 +20,7 @@ function semverConstruct() {
     eval $4=`echo "$1.$2.$3"`
 }
 
-function semverEQ() {
+function semverCmp() {
     local MAJOR_A=0
     local MINOR_A=0
     local PATCH_A=0
@@ -34,93 +34,94 @@ function semverEQ() {
     semverParseInto $1 MAJOR_A MINOR_A PATCH_A SPECIAL_A
     semverParseInto $2 MAJOR_B MINOR_B PATCH_B SPECIAL_B
 
-    if [ $MAJOR_A -ne $MAJOR_B ]; then
+    # major
+    if [ $MAJOR_A -lt $MAJOR_B ]; then
+        return -1
+    fi
+
+    if [ $MAJOR_A -gt $MAJOR_B ]; then
         return 1
     fi
 
-    if [ $MINOR_A -ne $MINOR_B ]; then
+    # minor
+    if [ $MINOR_A -lt $MINOR_B ]; then
+        return -1
+    fi
+
+    if [ $MINOR_A -gt $MINOR_B ]; then
         return 1
     fi
 
-    if [ $PATCH_A -ne $PATCH_B ]; then
+    # patch
+    if [ $PATCH_A -lt $PATCH_B ]; then
+        return -1
+    fi
+
+    if [ $PATCH_A -gt $PATCH_B ]; then
         return 1
     fi
 
-    if [[ "_$SPECIAL_A" != "_$SPECIAL_B" ]]; then
+    # special
+    if [[ "$SPECIAL_A" < "$SPECIAL_B" ]]; then
+        return -1
+    fi
+
+    if [[ "$SPECIAL_A" > "$SPECIAL_B" ]]; then
         return 1
     fi
 
+    # equal
+    return 0
+}
+
+function semverEQ() {
+    semverCmp $1 $2
+    local RESULT=$?
+
+    if [ $RESULT -ne 0 ]; then
+        # not equal
+        return 1
+    fi
 
     return 0
-
 }
 
 function semverLT() {
-    local MAJOR_A=0
-    local MINOR_A=0
-    local PATCH_A=0
-    local SPECIAL_A=0
+    semverCmp $1 $2
+    local RESULT=$?
 
-    local MAJOR_B=0
-    local MINOR_B=0
-    local PATCH_B=0
-    local SPECIAL_B=0
-
-    semverParseInto $1 MAJOR_A MINOR_A PATCH_A SPECIAL_A
-    semverParseInto $2 MAJOR_B MINOR_B PATCH_B SPECIAL_B
-
-    if [ $MAJOR_A -lt $MAJOR_B ]; then
-        return 0
-    fi
-
-    if [[ $MAJOR_A -le $MAJOR_B  && $MINOR_A -lt $MINOR_B ]]; then
-        return 0
-    fi
-
-    if [[ $MAJOR_A -le $MAJOR_B  && $MINOR_A -le $MINOR_B && $PATCH_A -lt $PATCH_B ]]; then
-        return 0
-    fi
-
-    if [[ "_$SPECIAL_A"  == "_" ]] && [[ "_$SPECIAL_B"  == "_" ]] ; then
+    # XXX: compare to 255, as returning -1 becomes return value 255
+    if [ $RESULT -ne 255 ]; then
+        # not lesser than
         return 1
     fi
-    if [[ "_$SPECIAL_A"  == "_" ]] && [[ "_$SPECIAL_B"  != "_" ]] ; then
-        return 1
-    fi
-    if [[ "_$SPECIAL_A"  != "_" ]] && [[ "_$SPECIAL_B"  == "_" ]] ; then
-        return 0
-    fi
 
-    if [[ "_$SPECIAL_A" < "_$SPECIAL_B" ]]; then
-        return 0
-    fi
-
-    return 1
-
+    return 0
 }
 
 function semverGT() {
-    semverEQ $1 $2
-    local EQ=$?
+    semverCmp $1 $2
+    local RESULT=$?
 
-    semverLT $1 $2
-    local LT=$?
-
-    if [ $EQ -ne 0 ] && [ $LT -ne 0 ]; then
-        return 0
-    else
+    if [ $RESULT -ne 1 ]; then
+        # not greater than
         return 1
     fi
+
+    return 0
 }
 
 function semverBumpMajor() {
     local MAJOR=0
     local MINOR=0
     local PATCH=0
-    local SPECIAL=0
+    local SPECIAL=""
 
     semverParseInto $1 MAJOR MINOR PATCH SPECIAL
     MAJOR=$(($MAJOR + 1))
+    MINOR=0
+    PATCH=0
+    SPECIAL=""
 
     semverConstruct $MAJOR $MINOR $PATCH $SPECIAL $2
 }
@@ -129,10 +130,12 @@ function semverBumpMinor() {
     local MAJOR=0
     local MINOR=0
     local PATCH=0
-    local SPECIAL=0
+    local SPECIAL=""
 
     semverParseInto $1 MAJOR MINOR PATCH SPECIAL
     MINOR=$(($MINOR + 1))
+    PATCH=0
+    SPECIAL=""
 
     semverConstruct $MAJOR $MINOR $PATCH $SPECIAL $2
 }
@@ -145,6 +148,7 @@ function semverBumpPatch() {
 
     semverParseInto $1 MAJOR MINOR PATCH SPECIAL
     PATCH=$(($PATCH + 1))
+    SPECIAL=""
 
     semverConstruct $MAJOR $MINOR $PATCH $SPECIAL $2
 }
@@ -152,8 +156,9 @@ function semverBumpPatch() {
 if [ "___semver.sh" == "___`basename $0`" ]; then
     if [ "$2" == "" ]; then
         echo "$0 <version> <command> [version]"
-        echo "Commands: eq, lt, gt, bump_major, bump_minor, bump_patch"
+        echo "Commands: cmp, eq, lt, gt, bump_major, bump_minor, bump_patch"
         echo ""
+        echo "cmp: compares left version against right version, return 0 if equal, 255 (-1) if left is lower than right, 1 if left is higher than right"
         echo "eq: compares left version against right version, returns 0 if both versions are equal"
         echo "lt: compares left version against right version, returns 0 if left version is less than right version"
         echo "gt: compares left version against right version, returns 0 if left version is greater than than right version"
@@ -161,6 +166,11 @@ if [ "___semver.sh" == "___`basename $0`" ]; then
         echo "bump_minor: bumps minor of version"
         echo "bump_patch: bumps patch of version"
         exit 255
+    fi
+
+    if [ "$2" == "cmp" ]; then
+        semverCmp $1 $3
+        exit $?
     fi
 
     if [ "$2" == "eq" ]; then
