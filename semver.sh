@@ -13,7 +13,7 @@ function semverParseInto() {
 }
 
 function semverConstruct() {
-    if [ "$5" != "" ]; then
+    if [[ $# -eq 5 ]]; then
         eval $5=`echo "$1.$2.$3-$4"`
     fi
 
