@@ -15,6 +15,7 @@ local MAJOR=0
 local MINOR=0
 local PATCH=0
 local SPECIAL=""
+local VERSION=""
 
 semverParseInto $A MAJOR MINOR PATCH SPECIAL
 echo "$A -> M:$MAJOR m:$MINOR p:$PATCH s:$SPECIAL. Expect M:1 m:3 p:2 s:"
@@ -146,6 +147,30 @@ echo "$G < $A -> $?. Expect 0."
 
 semverGT $G $A
 echo "$G > $A -> $?. Expect 1."
+
+
+echo "Bumping major"
+semverBumpMajor $A VERSION
+echo "$A -> $VERSION. Expect 2.3.2."
+
+semverBumpMajor $E VERSION
+echo "$A -> $VERSION. Expect 2.3.2-a."
+
+
+echo "Bumping minor"
+semverBumpMinor $A VERSION
+echo "$A -> $VERSION. Expect 1.4.2."
+
+semverBumpMinor $E VERSION
+echo "$A -> $VERSION. Expect 1.4.2-a."
+
+
+echo "Bumping patch"
+semverBumpPatch $A VERSION
+echo "$A -> $VERSION. Expect 1.3.3."
+
+semverBumpPatch $E VERSION
+echo "$A -> $VERSION. Expect 1.3.3-a."
 }
 
 semverTest

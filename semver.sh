@@ -12,6 +12,14 @@ function semverParseInto() {
     eval $5=`echo $1 | sed -e "s#$RE#\4#"`
 }
 
+function semverConstruct() {
+    if [ "$5" != "" ]; then
+        eval $5=`echo "$1.$2.$3-$4"`
+    fi
+
+    eval $4=`echo "$1.$2.$3"`
+}
+
 function semverEQ() {
     local MAJOR_A=0
     local MINOR_A=0
@@ -68,7 +76,7 @@ function semverLT() {
     if [[ $MAJOR_A -le $MAJOR_B  && $MINOR_A -lt $MINOR_B ]]; then
         return 0
     fi
-    
+
     if [[ $MAJOR_A -le $MAJOR_B  && $MINOR_A -le $MINOR_B && $PATCH_A -lt $PATCH_B ]]; then
         return 0
     fi
@@ -103,6 +111,42 @@ function semverGT() {
     else
         return 1
     fi
+}
+
+function semverBumpMajor() {
+    local MAJOR=0
+    local MINOR=0
+    local PATCH=0
+    local SPECIAL=0
+
+    semverParseInto $1 MAJOR MINOR PATCH SPECIAL
+    MAJOR=$(($MAJOR + 1))
+
+    semverConstruct $MAJOR $MINOR $PATCH $SPECIAL $2
+}
+
+function semverBumpMinor() {
+    local MAJOR=0
+    local MINOR=0
+    local PATCH=0
+    local SPECIAL=0
+
+    semverParseInto $1 MAJOR MINOR PATCH SPECIAL
+    MINOR=$(($MINOR + 1))
+
+    semverConstruct $MAJOR $MINOR $PATCH $SPECIAL $2
+}
+
+function semverBumpPatch() {
+    local MAJOR=0
+    local MINOR=0
+    local PATCH=0
+    local SPECIAL=0
+
+    semverParseInto $1 MAJOR MINOR PATCH SPECIAL
+    PATCH=$(($PATCH + 1))
+
+    semverConstruct $MAJOR $MINOR $PATCH $SPECIAL $2
 }
 
 if [ "___semver.sh" == "___`basename $0`" ]; then
