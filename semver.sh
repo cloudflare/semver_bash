@@ -152,7 +152,7 @@ function semverBumpPatch() {
     local MAJOR=0
     local MINOR=0
     local PATCH=0
-    local SPECIAL=0
+    local SPECIAL=""
 
     semverParseInto $1 MAJOR MINOR PATCH SPECIAL
     PATCH=$(($PATCH + 1))
@@ -161,10 +161,22 @@ function semverBumpPatch() {
     semverConstruct $MAJOR $MINOR $PATCH $SPECIAL $2
 }
 
+function semverStripSpecial() {
+    local MAJOR=0
+    local MINOR=0
+    local PATCH=0
+    local SPECIAL=""
+
+    semverParseInto $1 MAJOR MINOR PATCH SPECIAL
+    SPECIAL=""
+
+    semverConstruct $MAJOR $MINOR $PATCH $SPECIAL $2
+}
+
 if [ "___semver.sh" == "___`basename $0`" ]; then
     if [ "$2" == "" ]; then
         echo "$0 <version> <command> [version]"
-        echo "Commands: cmp, eq, lt, gt, bump_major, bump_minor, bump_patch"
+        echo "Commands: cmp, eq, lt, gt, bump_major, bump_minor, bump_patch, strip_special"
         echo ""
         echo "cmp: compares left version against right version, return 0 if equal, 255 (-1) if left is lower than right, 1 if left is higher than right"
         echo "eq: compares left version against right version, returns 0 if both versions are equal"
@@ -174,6 +186,8 @@ if [ "___semver.sh" == "___`basename $0`" ]; then
         echo "bump_major: bumps major of version, setting minor and patch to 0, removing special"
         echo "bump_minor: bumps minor of version, setting patch to 0, removing special"
         echo "bump_patch: bumps patch of version, removing special"
+        echo ""
+        echo "strip_special: strips special from version"
         exit 255
     fi
 
@@ -219,6 +233,12 @@ if [ "___semver.sh" == "___`basename $0`" ]; then
 
     if [ "$2" == "bump_patch" ]; then
         semverBumpPatch $1 VERSION
+        echo ${VERSION}
+        exit 0
+    fi
+
+    if [ "$2" == "strip_special" ]; then
+        semverStripSpecial $1 VERSION
         echo ${VERSION}
         exit 0
     fi

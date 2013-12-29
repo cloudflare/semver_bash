@@ -211,6 +211,14 @@ doTest "semverBumpPatch $A" "1.3.3" $VERSION
 
 semverBumpPatch $E VERSION
 doTest "semverBumpPatch $E" "1.3.3" $VERSION
+
+
+echo "Strip special"
+semverStripSpecial $A VERSION
+doTest "semverStripSpecial $A" "1.3.2" $VERSION
+
+semverStripSpecial $E VERSION
+doTest "semverStripSpecial $E" "1.3.2" $VERSION
 }
 
 semverTest
