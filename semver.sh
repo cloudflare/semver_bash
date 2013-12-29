@@ -170,22 +170,30 @@ if [ "___semver.sh" == "___`basename $0`" ]; then
 
     if [ "$2" == "cmp" ]; then
         semverCmp $1 $3
-        exit $?
+        RESULT=$?
+        echo $RESULT
+        exit $RESULT
     fi
 
     if [ "$2" == "eq" ]; then
         semverEQ $1 $3
-        exit $?
+        RESULT=$?
+        echo $RESULT
+        exit $RESULT
     fi
 
     if [ "$2" == "lt" ]; then
         semverLT $1 $3
-        exit $?
+        RESULT=$?
+        echo $RESULT
+        exit $RESULT
     fi
 
     if [ "$2" == "gt" ]; then
         semverGT $1 $3
-        echo $?
+        RESULT=$?
+        echo $RESULT
+        exit $RESULT
     fi
 
     if [ "$2" == "bump_major" ]; then
