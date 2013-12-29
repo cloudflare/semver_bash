@@ -150,25 +150,49 @@ function semverBumpPatch() {
 }
 
 if [ "___semver.sh" == "___`basename $0`" ]; then
+    if [ "$2" == "" ]; then
+        echo "$0 <version> <command> [version]"
+        echo "Commands: eq, lt, gt, bump_major, bump_minor, bump_patch"
+        echo ""
+        echo "eq: compares left version against right version, returns 0 if both versions are equal"
+        echo "lt: compares left version against right version, returns 0 if left version is less than right version"
+        echo "gt: compares left version against right version, returns 0 if left version is greater than than right version"
+        echo "bump_major: bumps major of version"
+        echo "bump_minor: bumps minor of version"
+        echo "bump_patch: bumps patch of version"
+        exit 255
+    fi
 
-MAJOR=0
-MINOR=0
-PATCH=0
-SPECIAL=""
+    if [ "$2" == "eq" ]; then
+        semverEQ $1 $3
+        exit $?
+    fi
 
-semverParseInto $1 MAJOR MINOR PATCH SPECIAL
-echo "$1 -> M: $MAJOR m:$MINOR p:$PATCH s:$SPECIAL"
+    if [ "$2" == "lt" ]; then
+        semverLT $1 $3
+        exit $?
+    fi
 
-semverParseInto $2 MAJOR MINOR PATCH SPECIAL
-echo "$2 -> M: $MAJOR m:$MINOR p:$PATCH s:$SPECIAL"
+    if [ "$2" == "gt" ]; then
+        semverGT $1 $3
+        echo $?
+    fi
 
-semverEQ $1 $2
-echo "$1 == $2 -> $?."
+    if [ "$2" == "bump_major" ]; then
+        semverBumpMajor $1 VERSION
+        echo ${VERSION}
+        exit 0
+    fi
 
-semverLT $1 $2
-echo "$1 < $2 -> $?."
+    if [ "$2" == "bump_minor" ]; then
+        semverBumpMinor $1 VERSION
+        echo ${VERSION}
+        exit 0
+    fi
 
-semverGT $1 $2
-echo "$1 > $2 -> $?."
-
+    if [ "$2" == "bump_patch" ]; then
+        semverBumpPatch $1 VERSION
+        echo ${VERSION}
+        exit 0
+    fi
 fi
