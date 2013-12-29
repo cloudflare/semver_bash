@@ -162,9 +162,10 @@ if [ "___semver.sh" == "___`basename $0`" ]; then
         echo "eq: compares left version against right version, returns 0 if both versions are equal"
         echo "lt: compares left version against right version, returns 0 if left version is less than right version"
         echo "gt: compares left version against right version, returns 0 if left version is greater than than right version"
-        echo "bump_major: bumps major of version"
-        echo "bump_minor: bumps minor of version"
-        echo "bump_patch: bumps patch of version"
+        echo ""
+        echo "bump_major: bumps major of version, setting minor and patch to 0, removing special"
+        echo "bump_minor: bumps minor of version, setting patch to 0, removing special"
+        echo "bump_patch: bumps patch of version, removing special"
         exit 255
     fi
 
