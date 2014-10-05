@@ -1,0 +1,8 @@
+{
+  "name": "semver_bash",
+  "version": "0.0.1",
+  "description": "Semantic Versioning in Bash",
+  "install": "cp semver.sh ${PREFIX:-/usr/local}/bin/semver",
+  "scripts": [ "semver.sh" ]
+}
+
