@@ -105,7 +105,7 @@ function semverGT() {
     fi
 }
 
-if [ "___semver.sh" == "___`basename $0`" ]; then
+if [[ ${BASH_SOURCE[0]} == $0 ]]; then
 
 MAJOR=0
 MINOR=0
