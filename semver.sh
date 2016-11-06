@@ -105,6 +105,28 @@ function semverGT() {
     fi
 }
 
+function semverGE() {
+    semverLT $1 $2
+    local LT=$?
+
+    if [ $LT -ne 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+function semverLE() {
+    semverGT $1 $2
+    local GT=$?
+
+    if [ $GT -ne 0 ]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 if [ "___semver.sh" == "___`basename $0`" ]; then
 
 MAJOR=0
@@ -126,5 +148,11 @@ echo "$1 < $2 -> $?."
 
 semverGT $1 $2
 echo "$1 > $2 -> $?."
+
+semverLE $1 $2
+echo "$1 <= $2 -> $?."
+
+semverGE $1 $2
+echo "$1 >= $2 -> $?."
 
 fi
