@@ -8,24 +8,41 @@ project.
 
 Usage
 -----
-semver_bash can be used from the command line as:  
 
-    $ ./semver.sh "3.2.1" "3.2.1-alpha"  
-    3.2.1 -> M: 3 m:2 p:1 s:  
-    3.2.1-alpha -> M: 3 m:2 p:1 s:-alpha  
-    3.2.1 == 3.2.1-alpha -> 1.  
-    3.2.1 < 3.2.1-alpha -> 1.  
+### semver_bash
+
+semver_bash can be used from the command line as:
+
+    $ ./semver.sh "3.2.1" "3.2.1-alpha"
+    3.2.1 -> M: 3 m:2 p:1 s:
+    3.2.1-alpha -> M: 3 m:2 p:1 s:-alpha
+    3.2.1 == 3.2.1-alpha -> 1.
+    3.2.1 < 3.2.1-alpha -> 1.
     3.2.1 > 3.2.1-alpha -> 0.
 
 
 Alternatively, you can source it from within a script:
 
-    . ./semver.sh  
-    
-    local MAJOR=0  
-    local MINOR=0  
-    local PATCH=0  
+    . ./semver.sh
+
+    local MAJOR=0
+    local MINOR=0
+    local PATCH=0
     local SPECIAL=""
-    
-    semverParseInto "1.2.3" MAJOR MINOR PATCH SPECIAL  
-    semverParseInto "3.2.1" MAJOR MINOR PATCH SPECIAL  
+
+    semverParseInto "1.2.3" MAJOR MINOR PATCH SPECIAL
+    semverParseInto "3.2.1" MAJOR MINOR PATCH SPECIAL
+
+
+### bump
+
+`bump.sh` can be used from the command line as:
+
+    $ ./bump.sh "v1.2.3"
+    1.2.4
+    $ ./bump.sh "v1.2.3" patch
+    1.2.4
+    $ ./bump.sh "v1.2.3" minor
+    1.3.0
+    $ ./bump.sh "v1.2.3" major
+    2.0.0
