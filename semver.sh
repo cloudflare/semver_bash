@@ -105,6 +105,49 @@ function semverGT() {
     fi
 }
 
+function semverIncrementPatch() {
+    local MAJOR=0
+    local MINOR=0
+    local PATCH=0
+    local SPECIAL=""
+
+    semverParseInto $1 MAJOR MINOR PATCH SPECIAL
+
+    PATCH=$((PATCH+1))
+
+    echo "$MAJOR.$MINOR.$PATCH$SPECIAL"
+}
+
+function semverIncrementMinor() {
+    local MAJOR=0
+    local MINOR=0
+    local PATCH=0
+    local SPECIAL=""
+
+    semverParseInto $1 MAJOR MINOR PATCH SPECIAL
+
+    MINOR=$((MINOR+1))
+    PATCH=0
+
+    echo "$MAJOR.$MINOR.$PATCH$SPECIAL"
+}
+
+function semverIncrementMajor() {
+    local MAJOR=0
+    local MINOR=0
+    local PATCH=0
+    local SPECIAL=""
+
+    semverParseInto $1 MAJOR MINOR PATCH SPECIAL
+
+    MAJOR=$((MAJOR+1))
+    MINOR=0
+    PATCH=0
+
+    echo "$MAJOR.$MINOR.$PATCH$SPECIAL"
+}
+
+
 if [ "___semver.sh" == "___`basename $0`" ]; then
 
 MAJOR=0
